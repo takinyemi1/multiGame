@@ -1,6 +1,6 @@
 '''
 Author: Temidayo Akinyemi
-Date: September 27, 2023
+Date: September 27, 2023 - 
 Program: multiGameGUI.py
 Description: Create a multigame program where the user has an option to play 1. Number Guessing Game,
 2. Rock, Paper, Scissors, or 3. Fun Fact Quiz Game. Each game will have a separate that the user will 
