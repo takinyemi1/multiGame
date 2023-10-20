@@ -1,0 +1,830 @@
+'''
+Author: Temidayo Akinyemi
+Date: September 27, 2023 - 
+Program: multiGameGUI.py
+Description: Create a multigame program where the user has an option to play 1. Number Guessing Game, 
+2. Rock, Paper, Scissors, or 3. Fun Fact Game. Then elevate the program by creating a GUI
+where the user will be able to click on each of those games as buttons and open a new window to
+play the game.
+
+'''
+# import tkinter
+from tkinter.ttk import *
+from tkinter import *
+# import random
+from random import randint
+import sys, os
+
+# create a MainWindow class
+class MainWindow(Toplevel):
+    
+        # set variable iVar equal to IntVar() which holds integer data that is able to be retrieved
+        iVar = IntVar()
+
+        # number of trials the user has
+        trial = 5
+        # generate a random number between 0 and 100
+        randNum = randint(0, 100)
+
+        # create a variable guess that is your StringVar()
+        sVar = StringVar()
+
+        # function to open a new window for game 1
+        def __init__(self, game1Window(), window = None):
+            
+            super().__init__(window = window)
+            
+            # title
+            self.title("Number Guessing Game")
+            
+            # geometry
+            self.geometry("690x600")
+            
+            # background color
+            self.config(bg = '#99FFCC')
+            
+            # let the Toplevel object be treated as a new window
+            # game1Window = Toplevel(window)
+
+            # set the title of the Toplevel widget
+            # game1Window.title("Number Guessing Game")
+
+            # set geometry of guessWindow
+            # game1Window.geometry("690x600")
+    
+            # background color
+            # game1Window.config(bg = '#99FFCC')
+
+            global trial
+            global randNum
+            global sVar
+    
+            # define a function that updates the start label telling the user the directions
+            def updateResult(text):
+                startLabel.configure(text = text)
+
+            # define a function guessNum() to able the Guess Number button and allow
+            # the user to begin guessing
+            def guessNum():
+                # set the button back to 'normal' once the user presses start game
+                guessNumButton.config(state = 'normal')
+
+                global trial
+                global randNum
+                # set randNum = randint(1, 100) again
+                randNum = randint(0, 100)
+                # as with trial
+                trial = 5
+                # set the text of update
+                updateResult(text = "Guess a random number between 0 and 100")
+                # font = ('courier', 15, 'bold')
+        
+                # use the delete function to delete the entry after guessing the number correctly
+                # or after the trials are finished
+                # set it to start at 0 = index of the first letter or number, 'end' for the function to decide
+                # where the entry ends
+                guessEntry.delete(0, 'end')
+
+            # define a function guessingGame() that plays the guessing game
+            def guessingGame():
+                # make trial and randNum global variables so they'll be able to accessed anywhere in the program
+                global trial
+                global randNum
+        
+                global iVar
+                global sVar
+
+                # set ask to retrieve the string input from sVar, but make sure to convert
+                # sVar into an integer variable because that it was you will be inputting
+                ask = int(sVar.get())
+
+                # set the outer for loop with the condition: if ask != randNum
+                if (trial != 0):
+                    # if your input != randNum, check if the user input is less than randNum
+                    if (ask < randNum):
+                        # format the numbers of trials left using f'{trial}'
+                        result = f"You have {trial} trials left. Your guess " + \
+                        str(ask) + " was too low!"
+                        # subtract 1 from each trial run through
+                        trial -= 1
+
+                    elif (ask > randNum):
+                        result = f"You have {trial} trials left. Your guess " + \
+                        str(ask) + " was too high!"
+                        trial -= 1
+
+                    # check if user input is equal to randNum
+                    else:
+                        result = (f"Congratulations! You guessed {randNum} correctly! " +
+                        f"\nIt took you {trial} trials! Click on 'Start Game' " +
+                        "\n to play again or 'Back to Menu' to return to the game.")
+                        # if you correctly guess randNum, set the state of the guess button back to 'disabled'
+                        guessNumButton.configure(state = 'disabled')
+
+                # if trial reaches zero and you haven't correctly guessed the number
+                else:
+                    result = ("Sorry! You have exhausted your number of trials! " + "\nThe number was " + str(randNum) + ". "
+                    + "\nThank you for playing!" + "\nClick on 'Start Game' to play again or 'Back to Menu' " +
+                    "\n to return to the menu.")
+                    # if you exhaust all your trials, set the state of the guess button back to 'disabled'
+                    guessNumButton.configure(state = 'disabled')
+
+                # update the result with whatever condition gets looped through
+                updateResult(result)
+
+            # labels, entries, and buttons for game1Window
+
+            # create the title label
+            nLabel = Label(self, text = 'Number Guessing Game', font = ('courier', 25, 'bold'),
+            bg = '#99FFCC')
+            nLabel.place(relx = 0.5, rely = 0.1, anchor = 'center')
+
+            # create startLabel that continuously gets updated based on the entry
+            # on the number guess after the user clicks 'Guess Number'
+            startLabel = Label(self, text = 'Click on Start Game', font = ('courier', 15, 'bold'),
+            bg = '#99FFCC')
+            startLabel.place(relx = 0.5, rely = 0.65, anchor = 'center')
+
+            # create startButton that allow you to start the guessing game
+            startButton = Button(self, text = 'Start Game', font = ('courier', 15, 'bold'),
+            bg = '#006600', fg = 'black', width = 10)
+            
+            startButton.bind("<Button>", lambda e: MainWindow(window))
+            startButton.place(relx = 0.35, rely = 0.9, anchor = 'center')
+
+            # create backButton that exits the window and lets you go back to the menu
+            backButton = Button(self, text = 'Back to Menu', font = ('courier', 15, 'bold'),
+            bg = '#006600', fg = 'black', width = 12, command = MainWindow)
+            backButton.place(relx = 0.65, rely = 0.9, anchor = 'center')
+
+            # create button guessNum that allows you to guess a number get a result on whether it was too high,
+            # too low, or if you got it correct
+            # set the state of guessNumButton to disabled so the user won't be able to get a headstart before
+            # they press 'Start Game'
+            guessNumButton = Button(self, text = 'Guess Number', font = ('courier', 15, 'bold'),
+            bg = '#006600', fg = 'black', state = 'disabled', command = guessingGame)
+            guessNumButton.place(relx = 0.35, rely = 0.5, anchor = 'center')
+
+            # create an entry that allows you to input the guess
+            guessEntry = Entry(self, font = ('courier', 15), textvariable = sVar, width = 15)
+            guessEntry.place(relx = 0.65, rely = 0.5, anchor = 'center')
+
+            # create welcomeLabel that lists the directions of the game
+            welcomeLabel = Label(self, text = "Welcome to the Number Guessing Game! " +
+            "\nIn this game, you will be asked to input a random number" +
+            "\nwhich will then be compared to the generated number from " +
+            "\nthe computer. You will have 5 trials to guess the number. " +
+            "\nYou will be told if it is too high, too low, \nor if you guessed correctly. " +
+            "\nEnjoy playing!",
+            font = ('courier', 13, 'bold'), bg = '#99FFCC', borderwidth = 2, 
+            width = 60, height = 5, relief = 'solid') # in order to put a border around a label, have height, width, borderwidth, and relief = 'solid' attributes set
+            # place on window
+            welcomeLabel.place(relx = 0.5, rely = 0.3, anchor = 'center')
+    
+# use radio buttons trial one
+# create radio button for game 1: Number Guessing Game
+'''
+game1RB = Radiobutton(window, text = 'Number Guessing Game', value = 1, variable = iVar,
+bg = 'light blue', font = ('courier', 13))
+game1RB.place(relx = 0.5, rely = 0.35, anchor = 'center')
+
+# create radio button for game 2: Rock, Paper, Scissors
+game2RB = Radiobutton(window, text = 'Rock, Paper, Scissors', value = 2, variable = iVar,
+bg = 'light blue', font = ('courier', 13))
+game2RB.place(relx = 0.5, rely = 0.45, anchor = 'center') 
+
+# create radio button for game 3: Fun Fact Game
+game3RB = Radiobutton(window, text = 'Fun Fact Game', value = 3, variable = iVar,
+bg = 'light blue', font = ('courier', 13))
+game3RB.place(relx = 0.5, rely = 0.55, anchor = 'center')
+
+# create button playbutton that allows you to play the game chosen from the radio buttons
+playButton = Button(window, text = "Play Game", font = ('courier', 15, 'bold'),
+bg = "light blue", fg = 'black', width = 10, height = 3, command = playGame)
+playButton.place(relx = 0.5, rely = 0.7, anchor = 'center')
+'''
+'''
+userLabel = Label(window, text = "User Chosen Number", font = ('courier', 15, 'bold'),
+bg = '#9966c')
+# place on grid
+userLabel.place(relx = 0.3, rely = 0.35, anchor = 'center')
+# create label compLabel that prints the acutal generated number
+compLabel = Label(window, text = "Random Number", font = ('courier', 15, 'bold'),
+bg = '#9966cc')
+# place on grid
+compLabel.place(relx = 0.5, rely = 0.35, anchor = 'center')
+# create label resultLabel that prints the result of each trial
+resultLabel = Label(window, text = "Result", font = ('courier', 15, 'bold'), 
+bg = '#9966cc')
+# place on window
+resultLabel.place(relx = 0.7, rely = 0.35, achor = 'center')
+'''
+        compChoice = randint(0,2)
+
+        # create variables userCount, compCount, and tieCount and set each to 0
+        userCount = 0
+        compCount = 0
+        tieCount = 0
+
+        # function game2Window to open a new window for game 2
+        def game2Window(): 
+            # let Toplevel object be treated as a new window
+            game2Window = Toplevel(window)
+                
+            # title
+            game2Window.title("Rock, Paper, Scissors")
+                
+            # geometry
+            game2Window.geometry("800x650")
+                 
+                    # background color
+                    game2Window.config(bg = '#FFFF66')
+                
+                    global sVar
+                
+                    global userCount
+                    global tieCount
+                    global compCount
+                    
+                # define function delete that will clear your entry box after the trials are finished
+                # or after you've hit a tie with the computer
+                # def delete():
+                #    rpsEntry.delete(0, 'end')
+                
+                # function that keeps count of amount of times the user wins
+                    
+                # function that keeps count of the amount of times computer wins
+                    
+                # function that keeps count of the amount of times the user and computer tie
+                
+                # define a function that updates the playLabel
+                def playUpdate(text):
+                    playLabel.configure(text = text)
+                    
+                # define a function rpsStart() that gives the game the ability to be played
+                # once playGame() is clicked on
+                def rpsStart():
+                    # set the state of the play button back to 'normal' once the user clicks
+                    # 'Start Game'
+                    rpsPlayButton.configure(state = 'normal')
+                    
+                    global counting
+                    global compChoice
+                    
+                    # set trial to 0 again
+                    trial = 1
+                    # set compChoice to randint(0,2) again
+                    compChoice = randint(0,2)
+                    
+                    # set the text that will continue getting updates
+                    playUpdate(text = "Enter 'rock', 'paper', or 'scissors'")
+                    
+                    # use the delete function to delete the entry after a tie or after the trials are finished
+                    # set it to start at 0 = index of the first letter or number, 'end' for the function to decide
+                    # where the entry ends
+                    rpsEntry.delete(0, 'end')
+                    # cTempLabel.deletecommand(0, END)
+                    # uTempLabel.deletecommand(0, END)
+                    # tTempLabel.deletecommand(0, END)
+                    
+                # define your main function rpsGame() that will actually play the game
+                def rpsGame():
+                    # make trial, compChoice, and sVar global variables so that they can be accessed
+                    # throughout the function
+                    global counting
+                    global compChoice
+                    global sVar
+                    
+                    global userCount
+                    global compCount
+                    global tieCount
+                    
+                    userCount = 0
+                    compCount = 0
+                    tieCount = 0
+                    
+                    # set compChoice equal to randint(0,2)
+                    compChoice = randint(0,2)
+                    
+                    # userChoice to retrieve the string input from sVar
+                    userChoice = sVar.get()
+                    
+                    # eventually create function that holds the count of each computer win, 
+                    # each tie, and each user win
+                    
+                    # create if-elif-else statements that set the int values as their concurring strings
+                    if (compChoice == 0):
+                        compChoice = 'rock'
+                    elif (compChoice == 1):
+                        compChoice = 'paper'
+                    else:
+                        compChoice = 'scissors'
+                    
+                    # set outer if statement that runs for as long as compCount, userCount, or tieCount don't equal 10 
+                    if (compCount != 10 or userCount != 10 or tieCount != 10):
+                        # write conditional statements for each choice
+                        if (compChoice == 'rock' and userChoice == 'scissors'):
+                            win = (f"Trial {counting}. " + "\nThe computer chose rock and the user chose scissors. " + 
+                            "\nComputer wins! ")
+                            # call the temporary text of cTempLabel and set it equal to the update of compCount
+                            compCount += 1
+                            cTempLabel['text'] = str(compCount)
+                        elif (compChoice == 'paper' and userChoice == 'rock'):
+                            win = (f"Trial {counting}. " + "\nThe computer chose paper and the user chose rock. " + 
+                            "\nComputer wins! ")
+                            # call the temporary text of cTempLabel and set it equal to the update of compCount
+                            compCount += 1
+                            cTempLabel['text'] = str(compCount)
+                        elif (compChoice == 'scissors' and userChoice == 'paper'):
+                            win = (f"Trial {counting}. " + "\nThe computer chose scissors and the user chose paper. " + 
+                            "\nComputer wins!")
+                            # call the temporary text of cTempLabel and set it equal to the update of compCount
+                            compCount += 1
+                            cTempLabel['text'] = str(compCount)
+                        # if it ends up being a tie set the state of rpsPlayButton back to 'disabled'
+                        elif (compChoice == userChoice):
+                            win = (f"Trial {counting}. It's a tie!")
+                            # Thank you for playing! " + 
+                            # "\nTo play again, click 'Start Game'. " + 
+                            # "\nTo go back to the menu, click 'Back to Menu'.")
+                            # rpsPlayButton.configure(state = 'disabled')
+                            # call the temporary text of tTempLabel and set it equal to the update of tieCount
+                            tieCount += 1
+                            tTempLabel['text'] = str(tieCount)
+                        else:
+                            win = (f"Trial {counting}. " + "\nUser wins!")
+                            counting += 1
+                            # call the temporary text of uTempLabel and set it equal to the update of userCount
+                            userCount += 1
+                            uTempLabel['text'] = str(userCount)
+                    else:
+                        win = ("Looks like 10 points have been reached! " +
+                        # "\nCongratulations to ! "
+                        "\nThank you for playing! To play again, click 'Start Game'. " +
+                        "\nTo go back to the menu, click 'Back to Menu'.")
+                        rpsPlayButton.configure(state = 'disabled')
+                    
+                    # update the text of playUpdate by calling the text of win, each time a condition gets fulfilled
+                    playUpdate(win)
+            
+                # labels, entries, and buttons for game2Window
+                
+                # create the title label
+                rpsLabel = Label(game2Window, text = 'Rock, Paper, Scissors Game', font = ('courier', 15, 'bold'),
+                bg = '#FFFF66')
+                rpsLabel.place(relx = 0.5, rely = 0.1, anchor = 'center')
+
+                # create playLabel that gets updated with a new text based on your input
+                # of rock, paper or scissors
+                playLabel = Label(game2Window, text = 'Click on Start Game', font = ('courier', 13, 'bold'),
+                bg = '#FFFF66')
+                playLabel.place(relx = 0.52, rely = 0.59, anchor = 'center')
+                
+                # create uLabel that presents the user's score
+                uLabel = Label(game2Window, text = '    User  ', font = ('courier', 13, 'bold'),
+                bg = '#FFFF66')
+                uLabel.place(relx = 0.3, rely = 0.67, anchor = 'center')
+                
+                # create uTempLabel that has a temporary '-'
+                uTempLabel = Label(game2Window, text = '-', font = ('courier', 13, 'bold'),
+                bg = '#FFFF66')
+                uTempLabel.place(relx = 0.34, rely = 0.77, anchor = 'center')
+                
+                # create tLabel that presents the tie score
+                tLabel = Label(game2Window, text = '|     Ties    ', font = ('courier', 13, 'bold'),
+                bg = '#FFFF66')
+                tLabel.place(relx = 0.5, rely = 0.67, anchor = 'center')
+                
+                # create tTempLabel that has a temporary '-'
+                tTempLabel = Label(game2Window, text = '-', font = ('courier', 13, 'bold'),
+                bg = '#FFFF66')
+                tTempLabel.place(relx = 0.52, rely = 0.77, anchor = 'center')
+                
+                # create cLabel that presents the computer's score
+                cLabel = Label(game2Window, text = '|   Computer', font = ('courier', 13, 'bold'),
+                bg = '#FFFF66')
+                cLabel.place(relx = 0.7, rely = 0.67, anchor = 'center')
+                
+                # create cTempLabel that has a temporary '-'
+                cTempLabel = Label(game2Window, text = '-', font = ('courier', 13, 'bold'),
+                bg = '#FFFF66')
+                cTempLabel.place(relx = 0.72, rely = 0.77, anchor = 'center')
+
+                # create a playButton that allows you to start the game
+                playButton = Button(game2Window, text = 'Start Game', font = ('courier', 15, 'bold'),
+                bg = '#FF6666', fg = 'black', width = 12, command = rpsStart)
+                playButton.place(relx = 0.35, rely = 0.9, anchor = 'center')
+
+                # create backMenuButton that exits the window and goes back to menu
+                backMenuButton = Button(game2Window, text = 'Back to Menu', font = ('courier', 15, 'bold'),
+                bg = '#FF6666', fg = 'black', width = 12, command = exit)
+                backMenuButton.place(relx = 0.65, rely = 0.9, anchor = 'center')
+
+                # create a button rpsPlayButton that allows you to input ('rock', 'paper', or 'scissors'),
+                # and lets you know if you won, the computer won, if it was a tie, or if you exhausted 
+                # the number of your trials
+                # set the state of rpsPlayButton to disabled so the user won't be able to play the game
+                # until they press 'Start Game'
+                rpsPlayButton = Button(game2Window, text = 'Play', font = ('courier', 15, 'bold'),
+                bg = '#FF6666', fg = 'black', state = 'disabled', width = 10, command = rpsGame)
+                rpsPlayButton.place(relx = 0.35, rely = 0.5, anchor = 'center')
+
+                # create an entry that allows you to input rock, paper, or scissors
+                rpsEntry = Entry(game2Window, font = ('courier', 15), textvariable = sVar, width = 15)
+                rpsEntry.place(relx = 0.65, rely = 0.5, anchor = 'center')
+
+                # create welcomeRPSLabel that lists the directions of the game
+                welcomeRPSLabel = Label(game2Window, text = "Welcome to the 'Rock, Paper, Scissors Game'! " +
+                "\nIn this game, you will be asked to input 'rock', 'paper', or " + 
+                "\n'scissors. Once you do, your input will be compared to a " +
+                "\ncomputer's input. For every computer win, user win, or tie, " +
+                "\nyour points will be recorded. If either player gets 10 points, " +
+                "\n the game will end, and the user will be congratulated." 
+                "\nEnjoy playing!", 
+                font = ('courier', 13, 'bold'), bg = '#FFFF66', borderwidth = 2,
+                width = 66, height = 7, relief = 'solid')
+                # place on window
+                welcomeRPSLabel.place(relx = 0.5, rely = 0.3, anchor = 'center')
+            
+    # count of the user's points
+    score = 0
+
+# number of questions
+totalQuestions = 11
+
+# function game3Window to open a new window for game 3        
+def game3Window():
+    # let Toplevel object to be treated as a new window
+    game3Window = Toplevel(window)
+    
+    # title
+    game3Window.title("Fun Fact Game")
+    
+    # geometry
+    game3Window.geometry("830x650")
+    
+    # background color
+    game3Window.config(bg = '#CCCC99')
+    
+    global sVar
+    global score
+    global totalQuestions
+    
+    # function factDate() that updates the stateLabel
+    def factDate(text):
+        factDateLabel.configure(text = text)
+        
+    # function hintUpdate() that updates the hintLabel
+    def hintUpdate(text):
+        hLabel.configure(text = text)
+        
+    # function scoreDate() that updates the tellScoreLabel
+    def scoreDate(text):
+        tLabel.configure(text = text)
+        
+    # function actualFact() that updates the actualFactLabel
+    def actualFact(text):
+        aFLabel.configure(text = text)
+        
+    # function factStart() that gives the game the chance to be played once factGame() is clicked on
+    def factStart():
+        # set the state of the play button back to normal once the 
+        # user presses 'Start Game'
+        factPlayButton.configure(state = 'normal')
+        
+        global score
+        global totalQuestions
+        
+        # reset the values
+        score = 0
+        totalQuestions = 11
+        
+        # set the text will continue to be updated
+        factDate(text = "Are you ready to play the Fun Fact Game? " +
+        "Enter 'yes' or 'no'")
+        
+        # set the text that will continue to be updated
+        hintUpdate(text = "Hints")
+        
+        # set the text that will continue to be updated
+        scoreDate(text = "Score")
+        
+        # set the text that will continue to be updated
+        actualFact(text = "Fun Fact")
+        # use the delete function to delete the entry after all
+        # the questions have been asked
+        factEntry.delete(0, 'end')
+
+    def funFactGame():
+        # set your global functions
+        global score
+        global totalQuestions
+        global sVar
+    
+        # reset the values
+        score = 0
+        totalQuestions = 11
+    
+        answer = sVar.get()
+
+        # set score = 0
+        score = 0
+        # set totalQuestions = 11, so you can calculate your score later
+        totalQuestions = 11
+        
+        # quest asks the question
+        # hint gives you a hint
+        # points keeps track of your score
+        # funFact lets you know a fun fact about the answer
+
+        if (answer == "yes"):
+            question = ("Question 1: How many degrees Fahrenheit is 100 degrees Celsius? ")
+            hint = ("\nHint: Fahrenheit = C * (9/5 or 1.8) + 32)")
+            hLabel['text'] = hint
+            if (answer == "212" or answer == "212 degrees Fahrenheit" or
+            answer == "212 degrees"):
+                quest = ("Your answer " + answer + " was correct!")
+                score += 2
+                points = ("\n Your score is " + str(score) + ".")
+            else:
+                quest = ("Your answer " + answer + " was incorrect.")
+                score -= 1
+                points = ("\nYour score is " + str(score) + ".")
+
+            question = ("Question 2: Is Mount Everest the world's tallest mountain? (yes or no)")
+            hint = "\nNo Hints!"
+            hLabel['text'] = hint
+            if (answer == "yes"):
+                quest = ("Your answer was correct!")
+                score += 2
+                points = ("\nYour score is now " + str(score) + ".")
+            else:
+                quest = ("Your answer was incorrect.")
+                score -= 1
+                points = ("\nYour score is now " + str(score) + ".")
+
+            question = ("Question 3: Is knowing 2 languages " +
+            "\nbeing bilingual or multilingual?")
+            hint = ("\nHint: Lingual only has one 'l'): ")
+            hLabel['text'] = hint
+            if (answer == "bilingual"):
+                quest = ("Your answer " + answer + " was correct!")
+                score += 2
+                points = ("Your score is now " + str(score) + ".")
+            else:
+                quest = ("Your answer " + answer + " was incorrect.")
+                score -= 1
+                points = ("Your score is now " + str(score) + ".")
+
+            question = ("Question 4: Who is one of the sharks from the show 'Shark Tank?'")
+            hint = "\nNo Hints!"
+            hLabel['text'] = hint
+            if (answer == "Mark Cuban" or answer == "Robert Herjavec" or answer == "Barbara Corcoran"
+                or answer == "Lori Greiner" or answer == "Daymond John" or answer == "Kevin O' Leary"):
+                quest = ("Your answer, " + answer + ", was correct!")
+                score += 2
+                points = ("Your score is now " + str(score) + ".")
+            else:
+                quest = ("Your answer " + answer + " was incorrect.")
+                score -= 1
+                points = ("Your score is now " + str(score) + ".")
+
+            question = ("Question 5: Who sang the song 'Happy'?")
+            hint = "\nNo Hints!"
+            hLabel['text'] = hint
+            if (answer == "Pharrell"):
+                quest = ("Your answer, " + answer + ", was correct!")
+                score += 2
+                points = ("Your score is now " + str(score) + ".")
+            else:
+                quest = ("Your answer, " + answer + ", was incorrect.")
+                score -= 1
+                points = ("Your score is now " + str(score) + ".")
+
+            question = ("Question 6: Can colorblind people see color? (yes or no)")
+            hint = "\nNo Hints!"
+            hLabel['text'] = hint
+            if (answer == "yes"):
+                quest = ("Your answer was correct!")
+                funFact = ("Some people who are colorblind " + "\ncan see very narrow ranges of color.")
+                score += 2
+                points = ("Your score is now " + str(score) + ".")
+            else:
+                quest = ("Your answer was incorrect.")
+                score -= 1
+                points = ("Your score is now " + str(score) + ".")
+
+            question = ("Question 7: Was ketchup once used as a medicine? (yes or no)")
+            hint = "\nNo Hints!"
+            hLabel['text'] = hint
+            if (answer == "yes"):
+                quest = ("Your answer was correct!") 
+                funFact = ("Ketchup was once used to cure " + "\nsicknesses such as diarrhea, " + "\nindigestion, and scurvy!")
+                score += 2
+                points = ("Your score is now " + str(score) + ".")
+            else:
+                quest = ("Your answer was incorrect.")
+                score -= 1
+                points = ("Your score is now " + str(score) + ".")
+
+            question = ("Question 8: Is soda the most popular beverage on the planet? (yes or no)")
+            hint = "\nNo Hints!"
+            hLabel['text'] = hint
+            if (answer == "yes"):
+                quest = ("You answer " + answer + " was incorrect.")
+                score -= 1
+                points = ("Your score is now " + str(score) + ".")
+            else:
+                quest = ("Your answer " + answer + " was correct!")
+                funFact = ("Water is actually the most " + "\npopular beverage.")
+                score += 2
+                points = ("Your score is now " + str(score) + ".")
+
+            question = ("Question 9: Are strawberries a part of the 'berry' category in fruits? (yes or no)")
+            hint = "\nNo hHints!"
+            hLabel['text'] = hint
+            if (answer == "yes"):
+                quest = ("Your answer " + answer + " was incorrect.")
+                score -= 1
+                points = ("Your score is now " + str(score) + ".")
+            else:
+                quest = ("Your answer " + answer + " was correct!")
+                funFact = ("Strawberries are actually not " + "\nberries because they're " + "\nconsidered 'false fruits.' " +
+                "\nThat is because strawberries " + "\nare made up of several " + "\nindividual fruits!")
+                score += 2
+                points = ("Your score is now " + str(score) + ".")
+
+            question = ("Question 10: Is Valentine's Day named after St. Valentine's? (yes or no)")
+            hint = "\nNo Hints!"
+            hLabel['text'] = hint
+            if (answer == "yes"):
+                quest = ("Your answer was correct!")
+                funFact = ("St.Valentine's name became " + "\nsynonymous with the day of love!")
+                score += 2
+                points = ("Your score is now " + str(score) + ".")
+            else:
+                quest = ("Your answer was incorrect.")
+                score -= 1
+                points = ("Your score is now " + str(score) + ".")
+                
+            question = ("Question 11: Who sat on the bus before Rosa Parks? ")
+            hint = "\nNo Hints!"
+            hLabel['text'] = hint
+            if (answer == "Claudette Colvin"):
+                quest = ("Your answer, " + answer + ", was correct!")
+                funFact = ("In March 1955, which was " + "\n9 months before Rosa Parks refused " + 
+                "\nto give up her seat to a " + "\nwhite passenger on the bus, " + "\n15 year-old Claudette Colvin " +
+              "\nhad done the exact same thing. " + "\nThe reason she was not given " + "\nthe same recognition as Rosa Parks was " +
+              "\nbecause the NAACP didn't think " + "\nthat she would serve as " + "\nan effective vessel." + " Some of the reasons that was, " +
+              "\nwas because she was 15, " + "\ndarkskin, and pregnant.")
+            # this question will be worth an extra ten points
+                score += 10
+                points = ("\nYour score is now " + str(score) + ".")
+            else:
+                quest = ("Your answer was incorrect. The correct answer is Claudette Colvin.")
+                score -= 1
+                points = ("Your score is now " + str(score) + ".")
+
+        else:
+            quest = ("Hopefully you'll consider playing next time!")
+            factPlayButton.configure(state = 'disabled')
+
+        scoreMark = ((score / totalQuestions) * 100)
+        points = ("\nThank you for playing " + "\nthe Fun Fact Game! " + 
+        "\nYou managed to score " +
+        str('{0:.2g}'.format(scoreMark)) + "\npoints out of 273 points!")
+        # + " Your total score was " + str(scoreMark) + "!")
+        
+        # update the text of each function by the text of their corresponding variables
+        factDate(question)
+        hintUpdate(hint)
+        scoreDate(points)
+        actualFact(funFact)
+        
+    # labels, entries, and buttons for game3Window
+    
+    # title label
+    factTitleLabel = Label(game3Window, text = 'Fun Fact Game', font = ('courier', 15, 'bold'),
+    bg = '#CCCC99')
+    factTitleLabel.place(relx = 0.5, rely = 0.08, anchor = 'center')
+    
+    # create factDateLabel that gets updated with a new text based on the answer
+    # to each question
+    factDateLabel = Label(game3Window, text = 'Click on Start Game', font = ('courier', 11, 'bold'),
+    bg = '#CCCC99')
+    factDateLabel.place(relx = 0.52, rely = 0.78, anchor = 'center')
+    
+    # create hintLabel that gets updated with a new next for hints based on what
+    # question is being answered
+    hintLabel = Label(game3Window, text = 'Hints', font = ('courier', 11, 'bold', 'underline'),
+    bg = '#CCCC99')
+    hintLabel.place(relx = 0.17, rely = 0.54, anchor = 'center')
+    
+    hLabel = Label(game3Window, text = '-', font = ('courier', 9),
+    bg = '#CCCC99')
+    hLabel.place(relx = 0.17, rely = 0.65, anchor = 'center')
+    
+    # create tellScoreLabel that gets updated with a new score based on whether the
+    # question is answered correctly or not
+    tellScoreLabel = Label(game3Window, text = 'Score', font = ('courier', 11, 'bold', 'underline'),
+    bg = '#CCCC99')
+    tellScoreLabel.place(relx = 0.5, rely = 0.54, anchor = 'center')
+
+    tLabel = Label(game3Window, text = '-', font = ('courier', 9), 
+    bg = '#CCCC99')
+    tLabel.place(relx = 0.5, rely = 0.65, anchor = 'center')
+
+    # create actualFactLabel that gets updated with a fun fact for each question
+    # that has one
+    actualFactLabel = Label(game3Window, text = 'Fun Fact', font = ('courier', 11, 'bold', 'underline'),
+    bg = '#CCCC99')
+    actualFactLabel.place(relx = 0.84, rely = 0.54, anchor = 'center')
+    
+    aFLabel = Label(game3Window, text = '-', font = ('courier', 9),
+    bg = '#CCCC99')
+    aFLabel.place(relx = 0.84, rely = 0.65, anchor = 'center')
+    
+    # create doPlayButton that allows you to start the game
+    doPlayButton = Button(game3Window, text = 'Start Game', font = ('courier', 15, 'bold'),
+    bg = '#FF6633', fg = 'black', width = 12, command = factStart)
+    doPlayButton.place(relx = 0.15, rely = 0.9, anchor = 'center')
+    
+    # create backToButton that allows you to go back to a question
+    backToButton = Button(game3Window, text = 'Back', font = ('courier', 15, 'bold'),
+    bg = '#FF6633', fg = 'black', width = 8)
+    backToButton.place(relx = 0.4, rely = 0.9, anchor = 'center')
+    
+    # create nextButton that allows you to move to the next question
+    nextButton = Button(game3Window, text = 'Next', font = ('courier', 15, 'bold'),
+    bg = '#FF6633', fg = 'black', width = 8)
+    nextButton.place(relx = 0.601, rely = 0.9, anchor = 'center')
+    
+    # create goBackButton that exits the window and goes back to the main menu
+    goBackButton = Button(game3Window, text = 'Back to Menu', font = ('courier', 15, 'bold'),
+    bg = '#FF6633', fg = 'black', width = 12, command = exit)
+    goBackButton.place(relx = 0.85, rely = 0.9, anchor = 'center')
+    
+    # create a button factPlayButton that allows you to input the answer you've chosen
+    # for each question
+    factPlayButton = Button(game3Window, text = 'Answer Question', font = ('courier', 15, 'bold'),
+    bg = '#FF6633', fg = 'black', state = 'disabled', width = 16, command = funFactGame)
+    factPlayButton.place(relx = 0.35, rely = 0.4, anchor = 'center')
+    
+    # create an entry that allows you to input yes, no, a number, or a name
+    factEntry = Entry(game3Window, font = ('courier', 15), textvariable = sVar, width = 18)
+    factEntry.place(relx = 0.65, rely = 0.4, anchor = 'center')
+    
+    # create stateLabel that lists the directions of the game
+    stateLabel = Label(game3Window, text = "Welcome to the Fun Fact (Quiz) Game! In this game, "
+    + "\nyou will be asked a total of 11 questions. For each question " + 
+    "\nyou get right, your score increases by 2 points. " +
+    "\nFor each question you get wrong, your score decreases " +
+    "\nby 1 point. Enjoy playing!", font = ('courier', 13, 'bold'), bg = '#CCCC99', borderwidth = 2,
+    width = 66, height = 6, relief = 'solid')
+    stateLabel.place(relx = 0.5, rely = 0.212, anchor = 'center')
+    
+# create a Tk() object
+window = Tk()
+
+# geometry
+window.geometry("690x600")
+
+# title, labels, and buttons for the main window
+    
+titleLabel = Label(window, text = "Welcome to the MultiGame!", font = ('courier', 20, 'bold', 'underline'),
+bg = '#9966cc')
+# how to center a label
+titleLabel.place(relx = 0.5, rely = 0.1, anchor = 'center')
+
+# ask the user to choose a game
+chooseLabel = Label(window, text = "Choose Your Game", font = ('courier', 15, 'bold'),
+bg = '#9966cc')
+chooseLabel.place(relx = 0.5, rely = 0.25, anchor = 'center')
+
+# trial 2: use regular buttons
+# create game1Play that allows you to choose the 'Number Guessing Game' and open the game in a new window
+game1Play = Button(window, text = 'Number Guessing Game', font = ('courier', 15, 'bold'),
+bg = '#FF99FF', fg = 'black', width = 23, height = 2)
+
+# bind the click event of the 'number guessing game' to opening a new window
+game1Play.bind("<Button>", lambda e: MainWindow(window))
+game1Play.place(relx = 0.5, rely = 0.38, anchor = 'center')
+
+# create game2Play that allows you to choose "Rock, Paper, Scissors" and open the game in a new window
+game2Play = Button(window, text = 'Rock, Paper, Scissors', font = ('courier', 15, 'bold'),
+bg = '#FF99FF', fg = 'black', width = 23, height = 2, command = game2Window)
+game2Play.place(relx = 0.5, rely = 0.5, anchor = 'center')
+
+# create game3Play that allows you to choose the 'Fun Fact Game'
+game3Play = Button(window, text = 'Fun Fact Game', font = ('courier', 15, 'bold'),
+bg = '#FF99FF', fg = 'black', width = 23, height = 2, command = game3Window)
+game3Play.place(relx = 0.5, rely = 0.62, anchor = 'center')
+
+# create exitButton that allows you to close the window once you're done playing the game
+exitButton = Button(window, text = 'Exit Game', font = ('courier', 15, 'bold'),
+bg = 'light blue', fg = 'black', width = 10, height = 2, command = exit)
+exitButton.place(relx = 0.5, rely = 0.85, anchor = 'center')
+
+
+# run the GUI
+MainWindow.mainloop()
