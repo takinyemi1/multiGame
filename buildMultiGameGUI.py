@@ -8,12 +8,15 @@ separate button that the user will click in order to open a new window that will
 '''
 # import all widgets and modules that are available in tkinter and ttk module
 from tkinter import *
-from tkinter import messagebox
+from tkinter import messagebox as mb
+# import json to use the json file that holds the questions&answers data
+import json
 import tkinter as tk
 from tkinter.ttk import *
 from tkinter import ttk
 # import random
 from random import randint
+import random
 
 class mainWindow(tk.Tk):
     
@@ -21,7 +24,8 @@ class mainWindow(tk.Tk):
         
         super().__init__()
         
-        self.geometry('690x600')
+        # geometry can be set as "lengthxwidth+x-pos+y-pos" to make it open at a certain position
+        self.geometry('690x600+350+50')
         self.title('MultiGame')
         self.config(background = '#F2D4CC')
 
@@ -36,11 +40,6 @@ class mainWindow(tk.Tk):
         command = self.game1ButtonClicked)
         # game1PlayButton.bind("<Button>", lambda e: game1Window(master))
         game1PlayButton.place(relx = 0.5, rely = 0.35, anchor = CENTER)
-
-        # button that allows the user to choose game 2: Rock, Paper, Scissors
-        
-        # create a photoimage object to use an image for rock, paper, scissors
-        # photo = PhotoImage(file = r'C:\Users\akiny\New folder\Code Files\Python Files\rps_img.jpg')
         
         game2PlayButton = ttk.Button(self, text = "Rock, Paper, Scissors", width = 23, style = 'Main.TButton', command = self.game2ButtonClicked)
         # , height = 2
@@ -83,7 +82,7 @@ class mainWindow(tk.Tk):
         # used for if the buttons are active 
         self.style.map('Main.TButton', background = [('active', '#d3d3d3')])
         
-    # function that is called when the 'Back to Menu' button is clicked on game1Window
+    # functions that will open the specified game once their designated buttons are clicked
     def game1ButtonClicked(self):
         self.new = game1Window()
         
@@ -99,7 +98,7 @@ class game1Window(Toplevel):
         
         super().__init__() # master = master
         self.title("Number Guessing Game")
-        self.geometry("800x600")
+        self.geometry("800x600+350+50")
         self.config(background = '#99FFCC')
         
         # create variable sVar that holds your StringVar() which holds string data 
@@ -129,20 +128,10 @@ class game1Window(Toplevel):
         # clicks 'Guess Number'
         self.startLabel = ttk.Label(self, text = "Click on Start Game", style = 'start.TLabel') # font size 15
         self.startLabel.place(relx = 0.5, rely = 0.63, anchor = CENTER)
-        
-        # hintLabel is constantly updated based on the state of the game. So if your guess was below the random number,
-        # it would tell you: "Hint: Your number is between {guess} and 100"
-        # self.hintLabel = ttk.Label(self, text = '-', style = 'start.TLabel')
-        # self.hintLabel.place(relx = 0.49, rely = 0.77, anchor = CENTER)
-        
+    
         # startButton allows you to start the guessing game
         self.startButton = ttk.Button(self, text = 'Start Game', style = 'g1.TButton', command = self.guessNum)
         self.startButton.place(relx = 0.35, rely = 0.9, anchor = CENTER)
-        
-        # hintButton allows you to receive a hint if the game is getting too difficult
-        # lambda allows you to pass self.hint into the button to generarte a hint whenever it is clicked
-        # self.hintButton = ttk.Button(self, text = 'Hint', style = 'g1.TButton', command = lambda: self.updateHint(self.hint))
-        # self.hintButton.place(relx = 0.5, rely = 0.9, anchor = CENTER)
         
         # backButton allows you to exit the game1Window and return to the mainWindow
         self.backButton = ttk.Button(self, text = 'Back to Menu', style = 'g1.TButton', command = self.destroy)
@@ -162,9 +151,10 @@ class game1Window(Toplevel):
         # label that lisst the directions of the game
         self.welcomeLabel = ttk.Label(self, text = "Welcome to the Number Guessing Game! " +
         "\nIn this game, you will be asked to input a random number" +
-        "\nwhich will then be compared to the generated number from " +
-        "\nthe computer. You will have 5 trials to guess the number. " +
-        "\nYou will be told if it is too high, too low, \nor if you guessed correctly. " +
+        "\nwhich will then be compared to the computer generated number." +
+        "\nYou will have 5 trials to guess the number. " +
+        "\nYou will be told if the number is too high, too low," + 
+        "\nor if you guessed the number correctly. " +
         "\nEnjoy playing!", style = 'welcomeLabel.TLabel') # in order to put a border around a label, have height, width, borderwidth, and
         # relif = 'solid' attributes set
         self.welcomeLabel.place(relx = 0.5, rely = 0.3, anchor = CENTER)
@@ -191,10 +181,6 @@ class game1Window(Toplevel):
         self.startLabel.configure(text = text)
         # self.hintLabel.configure(text = hints)
     
-    # # function that updates the hint label by giving the user a hint
-    # def updateHint(self, text):
-    #     self.hintLabel.configure(text = text)
-        
     # function that's able to enable the Guess Number button and allow the user to begin guessing
     def guessNum(self):
         # set the button back to NORMAL once the user clicks 'Start Game'
@@ -206,83 +192,42 @@ class game1Window(Toplevel):
         self.trial = 1
         self.total = 5
         self.randNum = randint(0, 100)
-        # self.hint = '-'
         
         # set the text of updateResult
         self.updateResult(text = "Guess a random number between 0 and 100")
-        # self.updateHint(text = "-")
-        # self.updateResult(hints = "-")
         
         # use the delete function to delete the entry after the user guessed the number correctly
         # or after the trials are finished
         # set it to start at 0 (index of the first number or letter), 'end' (function decides where
         # the entry ends)
         self.guessEntry.delete(0, END)
-        # self.guessEntry.insert(0, self.result)
-        
-    # make trial and randNum global variables inside of setting them to a value inside of the function because those values will
-    # reset everytime the function gets called
-    # trial = 1
-    # randNum = randint(0, 100)
-    # total = 5
     
     # function that plays the guessing game
     def guessingGame(self):
         self.iVar = IntVar()
         self.sVar = StringVar()
-        # self.hint = '-'
-        
-        # global trial
-        # global randNum
-        # global total
-        
-        # call trial from the previous function guessNum() because when the game runs in this function, it won't reset to
-        # its original value
-        
-        print(self.trial)
         
         self.trialRun = self.total - self.trial
         
         # since self.guessEntry textvariable is equal to the StringVar(), get the value of the input in the entry and
         # convert to an int
         self.ask = int(self.guessEntry.get()) 
-        # print("TESTING POINT")
-        # print(self.ask)
-        # print("AFTER THE TESTING POINT")
         
         # set the outer statement to run as long as trial doesn't equal 5
         if (self.trial != 5):
             # if your input doesn't equal randNum, check if the user input is less than randNum
             if (self.ask < self.randNum):
-                # self.askN = str(self.ask)
                 # format the numbers of trials left using f'{trial}'
-                # try to formay using .format() instead
+                # try to format using .format() instead
                 self.result = (f"Trial {self.trial}. Your guess {self.ask} was too low!" +
                 f"\nYou have {self.trialRun} trials left.")
-                # self.hint = (f"Hint: Your next guess should be between {self.ask} and 100.")
-                # (f"You have {self.trial} trials left. " +
-                # "\nYour guess " + self.ask + " was too low!")
-                # subtract 1 from each trial run
-                # print("TESTING POINT 1")
                 self.trial += 1
-                
-                # if (self.trialRun < 3):
-                #     self.hint = (f"Hint: Your next guess should be between {self.ask} and 100.")
                     
             # if user input is greater than randNum
             elif (self.ask > self.randNum):
                 self.result = (f"Trial {self.trial}. Your guess {self.ask} was too high!" +
                 f"\nYou have {self.trialRun} trials left.")
-                # self.hint = (f"Hint: Your next guess should be between 0 and {self.ask}.")
-                # (f"You have {self.trial} trials left. " + 
-                # "\nYour guess " + self.ask + " was too high!")
-                # print("TESTING POINT 2")
                 self.trial += 1
-                
-                # print(self.randNum)
-                
-                # if (self.trialRun < 3):
-                #     self.hint = (f"Hint: Your next guess should be between 0 and {self.ask}.")
              
         # problem: the program kept printing "sorry..." even if the player guessed the random number correctly.
         # solution: put the elif statement for if the number is guessed correctly outside of the inside if statement  
@@ -292,10 +237,6 @@ class game1Window(Toplevel):
             self.result = ("Congratulations! You guessed " + str(self.randNum) + " correctly!" + 
             f"\nYou used {self.trial} trials! \nClick on 'Start Game' to play again or " + 
             "\n'Back to Menu' to return to the main menu.")
-            # (f"Congratulations! You guessed {self.randNum} correctly! " +
-            # f"\nIt took you {self.trial} trials! Click on 'Start Game' " + 
-            # "\nto play again or 'Back to Menu' to return to the main menu.")
-            # if you guessed correctly, set the state of the guessNumButton back to 'disbaled'
             self.guessNumButton.configure(state = DISABLED)        
         
         # if the trial reaches zero and you haven't correctly guessed randNum
@@ -303,25 +244,77 @@ class game1Window(Toplevel):
             self.result = ("Sorry! You have exhausted the number of trials! " + f"\nThe number was {self.randNum}. "
             + "Thank you for playing!" + "\nClick on 'Start Game to play again or 'Back to Menu' " + 
             "\nto return to the menu.")
-            # print("RANDOM NUMBER" + self.randNum)
             # if you exhaust all your trials, set the state of guessNumButton back to DISABLED, command = ""
             self.guessNumButton.configure(state = DISABLED)
             
         # update the result with the text of the condition that gets looped through
         self.updateResult(self.result)
         
-        # update the hint with each condition that passes
-        # self.updateResult(self.hint)
-        # self.onHintClick(self.hint)
-        
+# this class opens a new window that will display three buttons for three different game options: single player, multiplayer, or back to menu
 class game2Window(Toplevel):
     
     def __init__(self):
         
         super().__init__()
         self.title("Rock, Paper, Scissors")
-        self.geometry("800x670")
+        self.geometry("800x640+270+20")
         self.config(background = '#FFFF66')
+        
+        titleLabel = ttk.Label(self, text = "Rock, Paper, Scissors", style = 'title.TLabel')
+        titleLabel.place(relx = 0.5, rely = 0.1, anchor = CENTER)
+
+        chooseLabel = ttk.Label(self, text = "Choose Your Game Type", style = 'label.TLabel')
+        chooseLabel.place(relx = 0.5, rely = 0.52, anchor = CENTER)
+
+        # button that allows user to choose the first game type: Single Player
+        singlePlayerButton = ttk.Button(self, text = "Single Player", width = 23, style = 'functionButtons.TButton',
+        command = self.singlePlayerButtonClicked)
+        singlePlayerButton.place(relx = 0.5, rely = 0.65, anchor = CENTER)
+        
+        # button that allows the user to choose the second game type: Multiplayer
+        multiPlayerButton = ttk.Button(self, text = "Multiplayer", width = 23, style = 'functionButtons.TButton', command = self.multiPlayerButtonClicked)
+        multiPlayerButton.place(relx = 0.5, rely = 0.75, anchor = CENTER)
+        
+        # button that allows the user to go back to the main menu
+        backTOMenu = ttk.Button(self, text = 'Back to Menu', width = 23, style = 'functionButtons.TButton', command = self.destroy)
+        backTOMenu.place(relx = 0.5, rely = 0.85, anchor = CENTER)
+        
+        # label that lists the directions for the game
+        self.tellLabel = ttk.Label(self, text = "Welcome to the 'Rock, Paper, Scissors Game'!" +
+            "\nIn this game, you will be asked to choose to play a" + 
+            "\nsingle player game or a multiplayer game." +
+            "\nOnce chosen, you will be led to a new window that will allow you to" +
+            "\nplay those games based off what was chosen. A single player game will" +
+            "\nlet you play against the computer. A multiplayer game will let you \nand another player play" 
+            " against each other. \nEnjoy Playing!", style = 'tellLabel.TLabel')
+        self.tellLabel.place(relx = 0.5, rely = 0.3, anchor = CENTER)
+        
+        # create style object
+        self.style = ttk.Style(self)
+        
+        # style for labels, buttons, and entries
+        self.style.configure('title.TLabel', font = ('courier', 30, 'bold'), background = '#FFFF66')
+        self.style.configure('label.TLabel', font = ('courier', 25, 'bold'), background = '#FFFF66')
+        self.style.configure('functionButtons.TButton', font = ('courier', 15, 'bold'), background = '#FF6666',
+        foreground = 'black')
+        self.style.configure('tellLabel.TLabel', font = ('courier', 13, 'bold'), background = '#FFFF66', borderwidth = 2, width = 69,
+        height = 10, relief = 'solid')
+        
+    def singlePlayerButtonClicked(self):
+        self.new = game2SinglePlayerWindow()
+    def multiPlayerButtonClicked(self):
+        self.new = playerNameEntries()
+        
+# this function plays the rock, paper, scissors single player game
+class game2SinglePlayerWindow(Toplevel):
+    
+    def __init__(self):
+        
+        super().__init__()
+        self.title("Rock, Paper, Scissors: Single Player")
+        self.geometry("840x670+270+15")
+        self.config(background = '#58AD38')
+        self.win = "Enter 'rock', 'paper', or 'scissors'"
         
         # create variables userCount, compCount, and tieCount that will hold the scores for each win
         self.userCount = 0
@@ -337,7 +330,7 @@ class game2Window(Toplevel):
         # labels, entries, and buttons for game2Window
         
         # title label
-        self.rpsLabel = ttk.Label(self, text = 'Rock, Paper, Scissors Game', style = 'title.TLabel')
+        self.rpsLabel = ttk.Label(self, text = 'Rock, Paper, Scissors Game: Single Player', style = 'multiTitle.TLabel')
         self.rpsLabel.place(relx = 0.5, rely = 0.1, anchor = CENTER)
         
         # label that gets updated with a new text based on your input of rock, paper, or scissors
@@ -346,35 +339,35 @@ class game2Window(Toplevel):
         
         # represents the user's score
         self.uLabel = ttk.Label(self, text = '   User    ', style = 'count.TLabel')
-        self.uLabel.place(relx = 0.3, rely = 0.67, anchor = CENTER)
+        self.uLabel.place(relx = 0.3, rely = 0.72, anchor = CENTER)
         
         # temporary label for user
         self.uTempLabel = ttk.Label(self, text = '0', style = 'gameLabels.TLabel')
-        self.uTempLabel.place(relx = 0.3, rely = 0.77, anchor = CENTER)
+        self.uTempLabel.place(relx = 0.3, rely = 0.82, anchor = CENTER)
         
         # represents the tie score
         self.tLabel = ttk.Label(self, text = '   Tie    ', style = 'count.TLabel')
-        self.tLabel.place(relx = 0.5, rely = 0.67, anchor = CENTER)
+        self.tLabel.place(relx = 0.5, rely = 0.72, anchor = CENTER)
         
         # temporary label for the tie
         self.tTempLabel = ttk.Label(self, text = '0', style = 'gameLabels.TLabel')
-        self.tTempLabel.place(relx = 0.5, rely = 0.77, anchor = CENTER)
+        self.tTempLabel.place(relx = 0.5, rely = 0.82, anchor = CENTER)
         
         # represents the computer score
         self.cLabel = ttk.Label(self, text = ' Computer  ', style = 'count.TLabel')
-        self.cLabel.place(relx = 0.72, rely = 0.67, anchor = CENTER)
+        self.cLabel.place(relx = 0.72, rely = 0.72, anchor = CENTER)
         
         # temporary label for computer
         self.cTempLabel = ttk.Label(self, text = '0', style = 'gameLabels.TLabel')
-        self.cTempLabel.place(relx = 0.72, rely = 0.77, anchor = CENTER)
+        self.cTempLabel.place(relx = 0.72, rely = 0.82, anchor = CENTER)
         
         # button that allows you to begin the game
-        self.playButton = ttk.Button(self, text = 'Start Game', command = self.rpsStart)
-        self.playButton.place(relx = 0.35, rely = 0.9, anchor = CENTER)
+        self.playButton = ttk.Button(self, text = 'Start Game', style = 'useButtons.TButton', command = self.rpsStart)
+        self.playButton.place(relx = 0.35, rely = 0.92, anchor = CENTER)
         
         # button that allows you to exit the game2Window and return to the main menu
-        self.backMenuButton = ttk.Button(self, text = 'Back to Menu', command = self.destroy)
-        self.backMenuButton.place(relx = 0.65, rely = 0.9, anchor = CENTER)
+        self.backMenuButton = ttk.Button(self, text = 'Back to Menu', style = 'useButtons.TButton', command = self.destroy)
+        self.backMenuButton.place(relx = 0.65, rely = 0.92, anchor = CENTER)
         
         # button that allows your to submit your input of rock, paper, or scissors, and lets you know if you won,
         # the computer won, or if there was a tie
@@ -384,30 +377,30 @@ class game2Window(Toplevel):
         
         # entry that allows you to input rock, paper, or scissors
         self.rpsEntry = ttk.Entry(self, style = 'gameEntry.TEntry', textvariable = self.sVar)
-        self.rpsEntry.place(relx = 0.65, rely = 0.5, anchor = CENTER)
+        self.rpsEntry.place(relx = 0.65, rely = 0.5, relheight = 0.05 ,anchor = CENTER)
         
         # welcomeLabel that lists the directions for the game
-        self.welcomeRPSLabel = ttk.Label(self, text = "Welcome to the 'Rock, Paper, Scissors Game'! " +
-                "\nIn this game, you will be asked to input 'rock', 'paper', or " + 
-                "\n'scissors. Once you do, your input will be compared to a " +
-                "\ncomputer's input. For every computer win, user win, or tie, " +
-                "\nyour points will be recorded. If either player gets 10 points, " +
-                "\n the game will end, and the user will be congratulated." 
-                "\nEnjoy playing!", style = 'welcomeLabel.TLabel')
+        self.welcomeRPSLabel = ttk.Label(self, text = "Welcome to the 'Rock, Paper, Scissors Game: Single Player'! " +
+            "\nIn this game, you will be asked to input 'rock', 'paper', or " + 
+            "\n'scissors'. Once you do, the user's choice will be compared to the " +
+            "\ncomputer's choice. For every computer win, user win, or tie, " +
+            "\nthose points will be recorded. If either the user or the computer" +
+            "\ngets 10 points, the game will end." 
+            "\nEnjoy playing!", style = 'welcomeLabel.TLabel')
         self.welcomeRPSLabel.place(relx = 0.5, rely = 0.3, anchor = CENTER)
         
         # create style object
         self.style = ttk.Style(self)
         
         # style for labels, buttons, and entries
-        self.style.configure('title.TLabel', font = ('courier', 25, 'bold'), background = '#FFFF66')
-        self.style.configure('count.TLabel', font = ('courier', 13, 'bold'), background = '#FFFF66', foreground = 'black',
+        self.style.configure('multiTitle.TLabel', font = ('courier', 25, 'bold'), background = '#58AD38')
+        self.style.configure('count.TLabel', font = ('courier', 13, 'bold'), background = '#58AD38', foreground = 'black',
         borderwidth = 2, width = 10, height = 2, relief = 'solid')
-        self.style.configure('gameLabels.TLabel', font = ('courier', 13, 'bold'), background = '#FFFF66')
-        self.style.configure('useButtons.TButton', font = ('courier', 15, 'bold'), background = '#FF666', foreground = 'black',
+        self.style.configure('gameLabels.TLabel', font = ('courier', 13, 'bold'), background = '#58AD38')
+        self.style.configure('useButtons.TButton', font = ('courier', 15, 'bold'), background = '#33EFF2', foreground = 'black',
         width = 12)
         self.style.configure('gameEntry.TEntry', font = ('courier', 15), width = 15)
-        self.style.configure('welcomeLabel.TLabel', font = ('courier', 13, 'bold'), background = '#FFFF66', borderwidth = 2, width = 66,
+        self.style.configure('welcomeLabel.TLabel', font = ('courier', 13, 'bold'), background = '#58AD38', borderwidth = 2, width = 66,
         height = 7, relief = 'solid')
         
     # function that updates the play label
@@ -419,7 +412,7 @@ class game2Window(Toplevel):
         
     # function that enables the 'Play' button and allows the user to begin inputting their response
     def rpsStart(self):
-        # set the state of playButton back to NORMAL
+        # set the state of rpsPlayButton back to NORMAL
         self.rpsPlayButton.configure(state = NORMAL)
         
         # set trial to 1
@@ -432,29 +425,20 @@ class game2Window(Toplevel):
         
         # set the text that will continue to be updated depending on the entry
         self.playUpdate(text = "Enter 'rock', 'paper', or 'scissors'", u = '0', c = '0', t = '0')
-        # self.playUpdate(u = '0')
-        # self.playUpdate(c = '0')
-        # self.playUpdate(t = '0')
         
         # delete the entry after either the user or the computer wins 10 times/points
         self.rpsEntry.delete(0, END)
-        self.uTempLabel.deletecommand
-        self.tTempLabel.deletecommand
-        self.cTempLabel.deletecommand
+        self.uTempLabel['text'] = '0'
+        self.tTempLabel['text'] = '0'
+        self.cTempLabel['text'] = '0'
         
     # main function that runs the rpsGame
     def rpsGame(self):
-        # set your sVar and iVar variables
-        self.iVar = IntVar()
-        self.sVar = StringVar()
+        # get the value from rpsEntry and make sure all user inputs are lowercase
+        self.userChoice = self.rpsEntry.get().lower()
         
-        print(self.trial)
-        
-        # get the value from rpsEntry
-        self.userChoice = self.rpsEntry.get()
-        print("Testing Point 1")
-        print(self.userChoice)
-        print("After Testing Point")
+        # problem: for whatever reason after the first entry, it gets deleted and the program prints "Invalid Entry" even though I put rock
+        # resolution: in order to fix that problem, i had to remove seld.iVar = IntVar() and self.sVar = StringVar() because they had already been initialized in the __init__ function
         
         # create if-elif-else statement that set the int values as their concurring strings
         if (self.compChoice == 0):
@@ -464,121 +448,434 @@ class game2Window(Toplevel):
         else:
             self.compChoice = 'scissors'
             
-        # set the outer if statement to run for as long as userCount and compCount != 10
-        if (str(self.compCount) != '10' or str(self.userCount) != '10'):
-            # conditional statements for each choice
-            if (self.compChoice == 'rock' and self.userChoice == 'scissors'):
-                self.win = (f"Trial {self.trial}. The computer chose rock and the user chose scissors." +
-                "\nComputer Wins!")
-                
-                # call temporary text of cTempLabel and set it equal to the update of compCount
-                self.compCount += 1
-                self.cTempLabel['text'] = str(self.compCount)
-                self.trial += 1
-                
-                print("CompCount Score")
-                print(self.compCount)
-                print('-')
-                
-            elif (self.compChoice == 'paper' and self.userChoice == 'rock'):
-                self.win = (f"Trial {self.trial}. The computer chose paper and the user chose rock." +
-                "\nComputer Wins!")
-                
-                # call temporary text of cTempLabel and set it equal to the update of compCount
-                self.compCount += 1
-                self.cTempLabel['text'] = str(self.compCount)
-                self.trial += 1
-                
-                print("CompCount Score")
-                print(self.compCount)
-                print('-')
+        # in order to fix the issue of the game not stopping after 10 points was reached by either the user or the computer, you have to first account for if the entry is invalid and then
+        # account for the rest of the game
+        # first check if the entry is valid
+        if (self.userChoice != 'rock' and self.userChoice != 'paper' and self.userChoice != 'scissors'):
+            self.win = ("Your entry is invalid. Please enter 'rock', 'paper', or 'scissors'.")
             
-            elif (self.compChoice == 'scissors' and self.userChoice == 'paper'):
-                self.win = (f"Trial {self.trial}. The computer chose scissors and the user chose paper." +
-                "\nComputer Wins!")
-                
-                # call the temporary text of cTempLabel and set it equal to the update of compCount
-                self.compCount += 1
-                self.cTempLabel['text'] = str(self.compCount)
-                self.trial += 1
-                
-                print("CompCount Score")
-                print(self.compCount)
-                print('-')
-                
-            # if it ends in a tie
-            elif (self.compChoice == self.userChoice):
-                self.win = (f"Trial {self.trial}. It's a tie!")
-                
-                # call the temporary text of tTempLavel and set it equal to the update of tieCount
-                self.tieCount += 1
-                self.tTempLabel['text'] = str(self.tieCount)
-                self.trial += 1
-                
-                print("TieCount Score")
-                print(self.tieCount)
-                print('-')
-                
-            elif (self.userChoice == 'rock' and self.compChoice == 'scissors') or (self.userChoice == 'paper' and self.compChoice == 'rock') and (self.userChoice == 'scissors' and self.compChoice == 'paper'):
-                self.win = (f"Trial {self.trial}. The user chose " + self.userChoice + " and the computer chose " + self.compChoice + "." +
-                "\nUser Wins!")
-                
-                # call the temporary text of uTempLavel and set it equal to the update of userCount
-                self.userCount += 1
-                self.uTempLabel['text'] = str(self.userCount)
-                self.trial += 1
-                
-                print("UserCount Score")
-                print(self.userCount)
-                print('-')
-                
-            # check if the user enters something other than rock, paper, or scissors
-            else:
-                self.win = ("Your entry is invalid. Please try again.")
-                
-                self.uTempLabel['text'] = str(self.userCount)
-                self.tTempLabel['text'] = str(self.tieCount)
-                self.cTempLabel['text'] = str(self.compCount)
-                
+            self.uTempLabel['text'] = str(self.userCount)
+            self.tTempLabel['text'] = str(self.tieCount)
+            self.cTempLabel['text'] = str(self.compCount)
+            
+        # account for the rest of the game
         else:
-            self.win("Looks like 10 points have been reached!" + 
-            "\nThank you for playing! To play again, click 'Start Game'." +
-            "\nTo go back to the menu, click 'Back to Menu'.")
-            self.rpsPlayButton.configure(state = DISABLED)
-            self.uTempLabel['text'] = '0'
-            self.tTempLabel['text'] = '0'
-            self.cTempLabel['text'] = '0'
-            
+            # set the outer if statement to run for as long as userCount and compCount != 10
+            if (self.compCount != 10 or self.userCount != 10):
+                # in order to update compChoice to a random variable after each trial, even if the userChoice stays the same
+                self.compChoice = random.choice(['rock', 'paper', 'scissors'])
+                
+                # conditional statements for each choice 
+                # find a way to change the repsonse of each user if the same choice is played
+                if (self.compChoice == 'rock' and self.userChoice == 'scissors') or (self.compChoice == 'paper' and self.userChoice == 'rock') or (self.compChoice == 'scissors' and self.userChoice == 'paper'):
+                    self.win = (f"Trial {self.trial}. The computer chose " + self.compChoice + " and the user chose " + self.userChoice + "." +
+                    "\nThe computer wins a point!")
+                    
+                    # call temporary text of cTempLabel and set it equal to the update of compCount
+                    self.compCount += 1
+                    self.cTempLabel['text'] = str(self.compCount)
+                    self.trial += 1
+                
+                # have the order of conditions match the first if statement
+                elif (self.compChoice == 'scissors' and self.userChoice == 'rock') or (self.compChoice == 'rock' and self.userChoice == 'paper') or (self.compChoice == 'paper' and self.userChoice == 'scissors'):
+                    self.win = (f"Trial {self.trial}. The computer chose " + self.compChoice + " and the user chose " + self.userChoice + "." +
+                    "\nThe user wins a point!")
+                    
+                    # call the temporary text of uTempLabel and set it equal to the update of userCount
+                    self.userCount += 1
+                    self.uTempLabel['text'] = str(self.userCount)
+                    self.trial += 1
+                
+                # solution: i had to account for a tie in the game for the entry of 'scissors' to be accepted
+                elif (self.compChoice == self.userChoice):
+                    self.win = ("It's a tie!")
+                    
+                    # update tieCount
+                    self.tieCount += 1
+                    self.tTempLabel['text'] = str(self.tieCount)
+                    self.trial += 1
+                
+                # problem: game doesn't stop after 10 points have been reached
+                # solution: instead of an else statement for the outside loop, put an if statement in the game loop 
+                if (self.compCount == 10 or self.userCount == 10):
+                    print("Game Over: 10 points have been reached!")
+                    self.win = ("Looks like 10 points have been reached!" + 
+                    "\nThank you for playing! To play again, click 'Start Game'." +
+                    "\nTo go back to the menu, click 'Back to Menu'.")
+                    self.rpsPlayButton.configure(state = DISABLED)
+                    self.uTempLabel['text'] = '0'
+                    self.tTempLabel['text'] = '0'
+                    self.cTempLabel['text'] = '0'
+                
         # update the text of playUpdate by calling the text of win, cTemp, tTemp, uTemp
         self.playUpdate(self.win, self.uTempLabel['text'], self.tTempLabel['text'], self.cTempLabel['text'])
+            
+# this function displays the page for both users to input their names
+class playerNameEntries(tk.Toplevel):
+    
+    def __init__(self, root = None):
         
+        super().__init__(root)
+        self.title("Rock, Paper, Scissors: Multiplayer Entries")
+        self.geometry("840x670+270+15")
+        self.config(background = '#B54FC6')
+        
+        # create your style object
+        self.style = ttk.Style(self)
+        
+        # style for labels, buttons, and entries
+        self.style.configure('multiTitle.TLabel', font = ('courier', 22, 'bold'), background = '#B54FC6')
+        self.style.configure('player1.TLabel', font = ('courier', 15, 'bold'), background = '#B54FC6')
+        self.style.configure('player1.TEntry', font = ('courier', 20), width = 15)
+        self.style.configure('player2.TLabel', font = ('courier', 15, 'bold'), background = '#B54FC6')
+        self.style.configure('player2.TEntry', font = ('courier', 20), width = 15)
+        self.style.configure('playRPS.TButton', font = ('courier', 15, 'bold'), width = 15, background = '#6F93E5', foreground = 'black')
+        self.style.configure('multiWelcomeLabel.TLabel', font = ('courier', 13, 'bold'), background = '#B54FC6', borderwidth = 2, width = 66,
+        height = 7, relief = 'solid')
+        
+        # separate variables that will receive the string inputs of the user's entries
+        self.player1SVar = StringVar()
+        self.player2SVar = StringVar()
+        
+        # call the entriesPage function which will display the entry options for the first and last name
+        self.entriesPage()
+
+    def entriesPage(self):
+        # title label
+        self.rpsLabel = ttk.Label(self, text = 'Rock, Paper, Scissors Game: Multiplayer Entries', style = 'multiTitle.TLabel')
+        self.rpsLabel.place(relx = 0.5, rely = 0.1, anchor = CENTER)
+        
+        # label and entry for player 1 name
+        self.player1NameLabel = ttk.Label(self, text = 'Enter Name for Player 1', style = 'player1.TLabel')
+        self.player1NameLabel.place(relx = 0.3, rely = 0.45, anchor = CENTER)
+        
+        self.player1NameEntry = ttk.Entry(self, style = 'player1.TEntry', textvariable = self.player1SVar)
+        self.player1NameEntry.place(relx = 0.3, rely = 0.55, relheight = 0.05 ,anchor = CENTER)
+        
+        # label and entry for player 2 name
+        self.player2NameLabel = ttk.Label(self, text = 'Enter Name for Player 2', style = 'player2.TLabel')
+        self.player2NameLabel.place(relx = 0.73, rely = 0.45, anchor = CENTER)
+        
+        self.player2NameEntry = ttk.Entry(self, style = 'player2.TEntry', textvariable = self.player2SVar)
+        self.player2NameEntry.place(relx = 0.73, rely = 0.55, relheight = 0.05, anchor = CENTER)
+        
+        # button that moves to the game page
+        self.playRPSGame = ttk.Button(self, text = 'Play Game', style = 'playRPS.TButton', command = self.displayMultiplayerGame)
+        self.playRPSGame.place(relx = 0.3, rely = 0.89, anchor = CENTER)
+        
+        # button that moves back to the rps menu
+        self.backRPS = ttk.Button(self, text = 'Back to Menu', style = 'playRPS.TButton', command = self.destroy)
+        self.backRPS.place(relx = 0.7, rely = 0.89, anchor = CENTER)
+        
+        self.welcome = ttk.Label(self, text = "Welcome to the 'Rock, Paper, Scissors Game'! " +
+            "\nFirst, input player 1's name and then input player 2's name." + 
+            "\nOnce that is done, click the 'Play Game' button, which will" +
+            "\nthen lead you to the rock, paper, scissors game.", style = 'multiWelcomeLabel.TLabel')
+        self.welcome.place(relx = 0.5, rely = 0.2, anchor = CENTER)
+        
+    # this function will get both player 1 and player 2's names and display them in the actual game
+    def displayMultiplayerGame(self):
+        # get the entries of each player entry so that it can be displayed on the next page
+        player1Name = self.player1SVar.get()
+        player2Name = self.player2SVar.get()
+        
+        # check if the user entered both player's names
+        if (player1Name and player2Name):
+            # destroy the current page 
+            self.destroy()
+            # and open the "page" (class) that will play the actual game
+            # use self.master to match with the mainWindow
+            game2MultiPlayerWindow(self.master, player1Name, player2Name)
+        # if they have not entered any names, display a label that alerts them that they cannot move to the next page (game page) until they enter a name
+        else:
+            self.nameLabel = ttk.Label(self, text = 'Please enter names for both players. \nYou cannot move to the game page otherwise.', style = 'player2.TLabel')
+            self.nameLabel.place(relx = 0.5, rely = 0.7, anchor = CENTER)
+            
+            
+# this function plays the rock, paper, scissors single player game
+class game2MultiPlayerWindow(tk.Toplevel):
+    
+    def __init__(self, root, player1Name, player2Name):
+        
+        super().__init__(root)
+        self.title("Rock, Paper, Scissors: Multiplayer")
+        self.geometry("840x670+270+15")
+        self.config(background = '#B54FC6')
+        self.win = "Enter 'rock', 'paper', or 'scissors'"
+        
+        # create variables player1Count, player2Count, and tieCount that will hold the scores for each win
+        self.player1Count = 0
+        self.player2Count = 0
+        self.tieCount = 0
+        
+        # for the player entries
+        self.p1sVar = StringVar()
+        self.p2sVar = StringVar()
+    
+        # labels, entries, and buttons for game2Window
+        
+        # title label
+        self.rpsLabel = ttk.Label(self, text = 'Rock, Paper, Scissors Game: Multiplayer', style = 'multiT.TLabel')
+        self.rpsLabel.place(relx = 0.5, rely = 0.1, anchor = CENTER)
+        
+        # label that gets updated with a new text based on your input of rock, paper, or scissors
+        self.playLabel = ttk.Label(self, text = 'Click on Start Game', style = 'playerName.TLabel')
+        self.playLabel.place(relx = 0.5, rely = 0.59, anchor = CENTER)
+        
+        # represents player 1's score
+        self.player1Label = ttk.Label(self, text = (f' Player 1: {player1Name}    '), style = 'score.TLabel')
+        self.player1Label.place(relx = 0.2, rely = 0.72, anchor = CENTER)
+        
+        # temporary label for player 1
+        self.player1TempLabel = ttk.Label(self, text = '0', style = 'counter.TLabel')
+        self.player1TempLabel.place(relx = 0.2, rely = 0.82, anchor = CENTER)
+        
+        # represents the tie score
+        self.tLabel = ttk.Label(self, text = '        Tie    ', style = 'score.TLabel')
+        self.tLabel.place(relx = 0.49, rely = 0.72, anchor = CENTER)
+        
+        # temporary label for the tie
+        self.tTempLabel = ttk.Label(self, text = '0', style = 'counter.TLabel')
+        self.tTempLabel.place(relx = 0.49, rely = 0.82, anchor = CENTER)
+        
+        # represents player 2's score
+        self.player2Label = ttk.Label(self, text = (f'   Player 2: {player2Name}  '), style = 'score.TLabel')
+        self.player2Label.place(relx = 0.75, rely = 0.72, anchor = CENTER)
+        
+        # temporary label for player 2
+        self.player2TempLabel = ttk.Label(self, text = '0', style = 'counter.TLabel')
+        self.player2TempLabel.place(relx = 0.75, rely = 0.82, anchor = CENTER)
+        
+        # button that allows you to begin the game
+        self.playButton = ttk.Button(self, text = 'Start Game', style = 'rpsbtn.TButton', command = self.rpsStart)
+        self.playButton.place(relx = 0.35, rely = 0.92, anchor = CENTER)
+        
+        # button that allows you to exit the game2Window and return to the main menu
+        self.backMenuButton = ttk.Button(self, text = 'Back to Menu', style = 'rpsbtn.TButton', command = self.destroy)
+        self.backMenuButton.place(relx = 0.65, rely = 0.92, anchor = CENTER)
+        
+        # button that allows your to submit your input of rock, paper, or scissors, and lets you know if you won,
+        # the computer won, or if there was a tie
+        # state of the button will be set to disabled until the user clicks 'Start Game'
+        self.rpsPlayButton = ttk.Button(self, text = 'Play', style = 'rpsbtn.TButton', state = DISABLED, command = self.mutliRPSGame)
+        self.rpsPlayButton.place(relx = 0.72, rely = 0.5, anchor = CENTER)
+        
+        # label that displays player 1's name
+        self.player1_Name = ttk.Label(self, text = f'{player1Name}', style = 'playerName.TLabel')
+        self.player1_Name.place(relx = 0.27, rely = 0.45, anchor = CENTER)
+        
+        # entry that allows player 1 to input rock, paper, or scissors
+        self.player1Entry = ttk.Entry(self, style = 'enterRPS.TEntry', textvariable = self.p1sVar)
+        self.player1Entry.place(relx = 0.27, rely = 0.5, relheight = 0.05, anchor = CENTER)
+        
+        # label that displays player 2's name
+        self.player2_Name = ttk.Label(self, text = f'{player2Name}', style = 'playerName.TLabel')
+        self.player2_Name.place(relx = 0.5, rely = 0.45, anchor = CENTER)
+        
+        # entry that allows player 2 to input rock, paper, or scissors
+        self.player2Entry = ttk.Entry(self, style = 'enterRPS.TEntry', textvariable = self.p2sVar)
+        self.player2Entry.place(relx = 0.5, rely = 0.5, relheight = 0.05, anchor = CENTER)
+        
+        # welcomeLabel that lists the directions for the game
+        self.welcomeRPSLabel = ttk.Label(self, text = "Welcome to the 'Rock, Paper, Scissors Game'! " +
+            "\nIn this game, both players will be prompted to enter 'rock', 'paper', or" + 
+            "\n'scissors'. Once that is done, player 1's choice will be compared to" +
+            "\nplayer 2's choice. For every player 1 win, player 2 win, or tie, " +
+            "\nthose points will be recorded. If either player 1 or player 2" +
+            "\nobtain 10 points, the game will end." 
+            "\nEnjoy playing!", style = 'multiWelcome.TLabel')
+        self.welcomeRPSLabel.place(relx = 0.5, rely = 0.27, anchor = CENTER)
+        
+        # create style object
+        self.style = ttk.Style(self)
+        
+        # style for labels, buttons, and entries
+        self.style.configure('multiT.TLabel', font = ('courier', 25, 'bold'), background = '#B54FC6')
+        self.style.configure('score.TLabel', font = ('courier', 11, 'bold'), background = '#B54FC6', foreground = 'black',
+        borderwidth = 2, width = 18, height = 2, relief = 'solid')
+        self.style.configure('counter.TLabel', font = ('courier', 13, 'bold'), background = '#B54FC6')
+        self.style.configure('rpsbtn.TButton', font = ('courier', 15, 'bold'), background = '#6F93E5', foreground = 'black',
+        width = 12)
+        self.style.configure('enterRPS.TEntry', font = ('courier', 15), width = 15)
+        self.style.configure('multiWelcome.TLabel', font = ('courier', 13, 'bold'), background = '#B54FC6', borderwidth = 2, width = 68,
+        height = 8, relief = 'solid')
+        self.style.configure('playerName.TLabel', font = ('courier', 12, 'bold'), background = '#B54FC6')
+        
+    # function that updates the play label
+    def playUpdate(self, text, p1, t, p2):
+        self.playLabel.configure(text = text)
+        self.player1TempLabel.configure(text = p1)
+        self.tTempLabel.configure(text = t)
+        self.player2TempLabel.configure(text = p2)
+        
+    # function that enables the 'Play' button and allows the user to begin inputting their response
+    def rpsStart(self):
+        # set the state of rpsPlayButton back to NORMAL
+        self.rpsPlayButton.configure(state = NORMAL)
+        
+        # set each playUpdate variable to its default values
+        self.p1 = '0'
+        self.t = '0'
+        self.p2 = '0'
+        self.trial = 1
+        
+        # set the text that will continue to be updated depending on the entry
+        self.playUpdate(text = "Enter 'rock', 'paper', or 'scissors'", p1 = '0', t = '0', p2 = '0')
+        
+        # delete the entry after either the user or the computer wins 10 times/points
+        self.player1Entry.delete(0, END)
+        self.player2Entry.delete(0, END)
+        self.player1TempLabel['text'] = '0'
+        self.tTempLabel['text'] = '0'
+        self.player2TempLabel['text'] = '0'
+        
+    # main function that runs the rpsGame
+    def mutliRPSGame(self):
+        # get the values from player 1 and make sure all user inputs are lowercase
+        self.player1Choice = self.player1Entry.get().lower()
+        
+        # get the values from player 2 and make sure all user inputs are lowercase
+        self.player2Choice = self.player2Entry.get().lower()
+            
+        # check if player 1's entries are not valid
+        if (self.player1Choice != 'rock' and self.player1Choice != 'paper' and self.player1Choice != 'scissors'):
+            self.win = (f"{self.player1_Name['text']}'s entry is invalid. Please enter 'rock', 'paper', or 'scissors'.")
+            
+            self.player1TempLabel['text'] = str(self.player1Count)
+            self.tTempLabel['text'] = str(self.tieCount)
+            self.player2TempLabel['text'] = str(self.player2Count)
+            
+        # check if player 2's entries are not valid
+        elif (self.player2Choice != 'rock' and self.player2Choice != 'paper' and self.player2Choice != 'scissors'):
+            self.win = (f"{self.player2_Name['text']}'s entry is invalid. Please enter 'rock', 'paper', 'scissors'.")
+            
+            self.player1TempLabel['text'] = str(self.player1Count)
+            self.tTempLabel['text'] = str(self.tieCount)
+            self.player2TempLabel['text'] = str(self.player2Count)
+            
+        # account for the rest of the game
+        else:
+            # set the outer if statement to run for as long as player1Count and player2Count != 10
+            if (self.player1Count != 10 or self.player2Count != 10):
+                # in order to update player1 and player2 to a random variable after each trial, even if the one of the other choices stays the same
+                
+                # to get both player's name entry since it is not an original variable of this class, you must use the .cget method which will obtain the string literal 
+                # also because both player's names are labels
+                # check if player 1 wins
+                if (self.player1Choice == 'rock' and self.player2Choice == 'scissors') or (self.player1Choice == 'paper' and self.player2Choice == 'rock') or (self.player1Choice == 'scissors' and self.player2Choice == 'paper'):
+                    self.win = (f"Trial {self.trial}. {self.player1_Name.cget('text')} chose " + self.player1Choice + f" and {self.player2_Name.cget('text')} chose " + self.player2Choice + "." +
+                    f"\n{self.player1_Name.cget('text')} wins a point!")
+                    
+                    # call temporary text of cTempLabel and set it equal to the update of compCount
+                    self.player1Count += 1
+                    self.player1TempLabel['text'] = str(self.player1Count)
+                    self.trial += 1
+                
+                # check if player 2 wins
+                elif (self.player1Choice == 'scissors' and self.player2Choice == 'rock') or (self.player1Choice == 'rock' and self.player2Choice == 'paper') or (self.player1Choice == 'paper' and self.player2Choice == 'scissors'):
+                    self.win = (f"Trial {self.trial}. {self.player1_Name.cget('text')} chose " + self.player1Choice + f" and {self.player2_Name.cget('text')} chose " + self.player2Choice + "." +
+                    f"\n{self.player2_Name.cget('text')} wins a point!")
+                    
+                    # call the temporary text of uTempLabel and set it equal to the update of userCount
+                    self.player2Count += 1
+                    self.player2TempLabel['text'] = str(self.player2Count)
+                    self.trial += 1
+                
+                elif (self.player1Choice == self.player2Choice):
+                    self.win = ("It's a tie!")
+                    
+                    # update tieCount
+                    self.tieCount += 1
+                    self.tTempLabel['text'] = str(self.tieCount)
+                    self.trial += 1
+                
+                if (self.player1Count == 10 or self.player2Count == 10):
+                    if (self.player1Count == 10):
+                        self.win = (f"Looks like 10 points have been reached by {self.player1_Name.cget('text')}!" +
+                        f"\nThank you {self.player1_Name.cget('text')} and {self.player2_Name.cget('text')} for playing! To play again, click 'Start Game'." +
+                        "\nTo go back to the menu, click 'Back to Menu'.")
+                    elif (self.player2Count == 10):
+                        self.win = (f"Looks like 10 points have been reached by {self.player2_Name.cget('text')}!" +
+                        f"\nThank you {self.player1_Name.cget('text')} and {self.player2_Name.cget('text')} for playing! To play again, click 'Start Game'." +
+                        "\nTo go back to the menu, click 'Back to Menu'.")
+                        
+                    self.rpsPlayButton.configure(state = DISABLED)
+                    self.player2TempLabel['text'] = '0'
+                    self.tTempLabel['text'] = '0'
+                    self.player1TempLabel['text'] = '0'
+                
+        # since you are also checking to see if both entries are valid befiore playing the actual game, move this to the outer for loop so 
+        # that the self.win label is updated accordingly
+        
+        # update the text of playUpdate by calling the text of win, cTemp, tTemp, uTemp
+        self.playUpdate(self.win, self.player1TempLabel['text'], self.tTempLabel['text'], self.player2TempLabel['text'])
+            
 class game3Window(Toplevel):
-    # constructor that will be called everytime the program is run
+    # method that will set the question count to 0 and initialize all the other methods that will display the content
+    # and make all the other functionalities available.
     def __init__(self):
         
         super().__init__()
         self.title("Fun Fact Quiz Game")
-        self.geometry("830x650")
+        self.geometry("1050x650+170+30")
         self.config(background = '#CCCC99')
         
-        # title label
-        self.factTitleLabel = ttk.Label(self, text = 'Fun Fact Game', style = 'title.TLabel')
-        self.factTitleLabel.place(relx = 0.5, rely = 0.08, anchor = CENTER)
+        # converting your json array to a python list
+        with open('multiGameQuizData.json') as f:
+            data = json.load(f)
+            
+        self.questions = (data['questions'])
+        self.options = (data['options'])
+        self.answers = (data['answers'])
+        
+        # set the number of questions to 0
+        self.questionNumber = 0
+        
+        # these functions will be updated later as the next button is clicked
+        self.displayQuizTitle()
+        self.displayQuizQuestion()
+        
+        # set quizOptionSelected equal to Intvar() will allow the variable to hold an integer value that
+        # is used for a selected option in a question
+        self.quizOptionSelected = IntVar()
+        
+        # displays the radio button for the current questions and will display the options for the current question
+        self.opt = self.radioButtons()
+        
+        # this function will display the options (text wise) for the current question
+        self.displayQuizOptions()
+        
+        # number of questions
+        self.dataSize = len(self.questions)
+        
+        # this will keep count of the number of correct answers
+        self.correctAnswers = 0
+        
+        # keeps count of wrong answers
+        self.wrongAnswers = 0
+        
+        self.answerLabel = ttk.Label(self, text = "Click on 'Start Quiz' to begin the quiz.", style = 'answer.TLabel')
+        self.answerLabel.place(relx = 0.5, rely = 0.78, anchor = CENTER)
         
         # button that starts the quiz game overall
-        self.doStartButton = ttk.Button(self, text = 'Start Game', style = 'startAndBackButtons.TButton')
-        self.doStartButton.place(relx = 0.15, rely = 0.9, anchor = CENTER)
+        self.doStartButton = ttk.Button(self, text = 'Start Quiz', command = self.startGame, style = 'nextAndBackButtons.TButton')
+        self.doStartButton.place(relx = 0.17, rely = 0.89, anchor = CENTER)
+        
+        # the next button that allows you to move to the next question
+        self.nextQuestionButton = ttk.Button(self, text = 'Next Question', state = DISABLED, command = self.nextQuestion, style = 'nextAndBackButtons.TButton')
+        self.nextQuestionButton.place(relx = 0.51, rely = 0.89, anchor = CENTER)
         
         # button that allows you to go back to the menu
-        self.goBacktoMenuButton = ttk.Button(self, text = 'Back to Menu', style = 'startAndBackButtons.TButton', command = self.destroy)
-        self.goBacktoMenuButton.place(relx = 0.85, rely = 0.9, anchor = CENTER)
+        self.goBacktoMenuButton = ttk.Button(self, text = 'Back to Menu', style = 'nextAndBackButtons.TButton', command = self.destroy)
+        self.goBacktoMenuButton.place(relx = 0.83, rely = 0.89, anchor = CENTER)
         
         # welcome label
-        self.stateLabel = ttk.Label(self, text = "Welcome to the Fun Fact (Quiz) Game! In this game, "
-        + "\nyou will be asked a total of 11 questions. For each question " + 
+        self.stateLabel = ttk.Label(self, text = "Welcome to the Fun Fact Quiz Game! In this game," + 
+        "\nyou will be asked random questions that vary from topic to topic. For each question" + 
         "\nyou get right, your score increases by 2 points. " +
-        "\nFor each question you get wrong, your score decreases " +
-        "\nby 1 point. Enjoy playing!", style = 'stateLabel.TLabel')
+        "\nYour quiz summary will be shown at the end of the quiz." +
+        "\nTo begin the quiz, click on 'Start Quiz'." +
+        "\nEnjoy playing!", style = 'stateLabel.TLabel')
         self.stateLabel.place(relx = 0.5, rely = 0.212, anchor = CENTER)
         
         # create style object
@@ -586,35 +883,152 @@ class game3Window(Toplevel):
         
         # style for labels, buttons, and maybe entries
         self.style.configure('title.TLabel', font = ('courier', 25, 'bold'), background = '#CCCC99')
-        self.style.configure('startAndBackButtons.TButton', font = ('courier', 15, 'bold'), background = '#FF6633',
-        foreground = 'black', width = 12)
+        self.style.configure('nextAndBackButtons.TButton', font = ('courier', 15, 'bold'), background = '#FF6633',
+        foreground = 'black', width = 14)
+        self.style.configure('question.TLabel', font = ('courier', 14, 'bold'), background = '#CCCC99', width = 72)
         self.style.configure('stateLabel.TLabel', font = ('courier', 13, 'bold'), background = '#CCCC99',
         borderwidth = 2, width = 66, height = 6, relief = 'solid')
+        self.style.configure('answer.TLabel', font = ('courier', 14, 'bold'), background = '#CCCC99')
+        self.style.configure('radio.TRadiobutton', font = ('courier', 13, 'bold'))
         
         # create json file that will holds your questions and answers for the quiz
         # they will hold name/value pairs and contain an array of values
-        
+
         '''
         To create this Fun Fact Quiz Game:
-        1. Import modules: tkinter and json
-        2. Add widgets to display the data
-        3. Add the functionalities to the button
-        4. Use the data from the json file
+        1. Create your json file that holds your questions, answers and options for the quiz.
+        Problem Encountered: json file would not load with error message as: "No such file or directory" so to make it work, create the json file
+        outside of the Python File folder.
+        2. Import modules: tkinter and json
+        3. Convert your json array to your python list
+        4. Create the main variables and functions for your quiz program
         '''
         
-        # create your variables and functions that will be called for each part of your program
-        self.questionNumber = 0
-        self.quizTitle()
-        self.eachQuestions()
-        # set your variable that will hold IntVar()
-        self.optionSelection = IntVar()
-        self.options = self.radio_Buttons()
-        self.theOptions()
-        self.buttons()
-        self.totalQuestionSize = len(questions)
-        self.correctQuestions = 0
+    # function that updates the answer label
+    def updateAnswer(self, text):
+        self.answerLabel.configure(text = text)
         
-        # function that displays the result for the quiz in a messagebox
+    # function that will start the game once 'Start Game' is clicked
+    def startGame(self):
+        # set the state of next question to normal
+        self.nextQuestionButton.configure(state = NORMAL)
+        
+        # set the text that will continue to be updated depending on the radio button chosen
+        self.updateAnswer(text = "Choose your answer and then click the 'Next Question' button")
+        
+    # this function will display the quiz result
+    # it will count the number of correct answers and wrong answers, which will then be displayed at the end in a message box
+    def displayQuizResult(self):
+        # calculate the number of wrong answers
+        wrongAnswers = self.dataSize - self.correctAnswers
+        correctAnswers = (f"Correct Answers: {self.correctAnswers}")
+        wrong = (f"Wrong Answers: {wrongAnswers}")
+        
+        # calculate the score percentage of correct answers
+        totalScore = int((self.correctAnswers / self.dataSize) * 100)
+        quizResult = (f"Total Score: {totalScore}%")
+        
+        # messagebox that will display the result
+        mb.showinfo("Quiz Summary", f"{quizResult} \n{correctAnswers} \n{wrong}")
+        
+    # this function will check the answer after the next button is clicked
+    def checkAnswer(self, questionNumber):
+        # check if the selected option is correct
+        if (self.quizOptionSelected.get() == self.answers[questionNumber]):
+            # update the text of updateAnswer by calling the text of answerCorrect
+            self.answerCorrect = "Your answer was correct!"
+        
+        # check if the user chooses the incorrect answer
+        else:
+            self.answerCorrect = "Sorry, your answer was incorrect."
+            
+        # update the text of updateAnswer
+        self.updateAnswer(self.answerCorrect)
+        
+    # this function will check the answer of the current question by calling checkAnswer() and questionNumber.
+    # if the question is correct, the user's correctAnswer score will increase by 2 and then increase the question number by 1.
+    # if it's the last question, it calls the displayQuizResult() function which will show the message box.
+    # otherwise, the next question will be shown.
+    def nextQuestion(self):
+        # check to see if the user selected an option
+        if (self.quizOptionSelected.get() == 0):
+            # if an option does not get selected, display a message notifying the user of that
+            self.updateAnswer("You did not select an answer choice. Please select one or you won't be \nable to move to the next question.")
+            return
+        
+        # check if the answer is correct
+        if (self.checkAnswer(self.questionNumber)):
+            # if the answer is correct, correctAnswer count will be incremented by 2
+            self.correctAnswers += 2
+    
+        # the next question will be moved to by incrementing the questionNumber counter
+        self.questionNumber += 1
+        
+        # this will check if the questionNumber size is equal to the dataSize
+        if (self.questionNumber == self.dataSize):
+            # if it is correct, then it will display the quiz score
+            self.displayQuizResult()
+            
+            # that window will then be destroyed
+            self.destroy()
+            
+        else:
+            # otherwise, show the next question
+            self.displayQuizQuestion()
+            self.displayQuizOptions()
+            
+    # this function will deselect the radio button on the screen
+    # it will then be used to display the options available for the current question which will be
+    # obtained through the question number and updates each of the options for the current question of 
+    # the radio button
+    def displayQuizOptions(self):
+        
+        val = 0
+        # this will deselect the options
+        self.quizOptionSelected.set(0)
+        
+        # this will loop over the options to be displayed for the text of the radio buttons
+        for option in self.options[self.questionNumber]:
+            self.opt[val]['text'] = option
+            val += 1
+            
+    # this function will show the current question on the screen
+    def displayQuizQuestion(self):
+        # set the question properties
+        questionNumber = ttk.Label(self, text = self.questions[self.questionNumber], style = 'question.TLabel')
+        questionNumber.place(relx = 0.5, rely = 0.35, anchor = CENTER)
+        
+    # this function will display the quiz title
+    def displayQuizTitle(self):
+        # title label
+        factTitleLabel = ttk.Label(self, text = 'Fun Fact Game', style = 'title.TLabel')
+        factTitleLabel.place(relx = 0.5, rely = 0.08, anchor = CENTER)
+        
+    # this function will show the radio buttons to select the question on the screen at the specified position.
+    # it will also return a list of the radio buttons which are later used to add the quiz options to them
+    def radioButtons(self):
+        # initialize the list with an empty list of options
+        qList = []
+        
+        # this is the option of the first option
+        y_pos = 0.4
+        
+        # add the options to the list
+        while len(qList) < 4:
+            # set the radio button properties
+            radioBtn = ttk.Radiobutton(self, text = " ", variable = self.quizOptionSelected, value = len(qList) + 1, style = 'radio.TRadiobutton')
+            # radioBtn.configure(state = DISABLED)
+            
+            # add the button to the list
+            qList.append(radioBtn)
+            
+            # place the button
+            radioBtn.place(relx = 0.1, rely = y_pos)
+            # increment the y_pos by 0.09
+            y_pos += 0.09
+            
+        # return the radio buttons
+        return qList
         
 # runs the mainWindow
 if __name__ == "__main__":
